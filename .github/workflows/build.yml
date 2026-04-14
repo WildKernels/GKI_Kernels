@@ -142,11 +142,6 @@ jobs:
             sed -i '/#include <trace\/hooks\/blk.h>/a #include <trace\/hooks\/fs.h>' ./fs/namespace.c
         fi
 
-    - name: Configure Kernel Options
-      uses: ./.github/actions/configure-kernel
-      with:
-        kernel_version: ${{ steps.parse.outputs.kernel_version }}
-
     - name: Apply ABI Compare Bypass
       if: ${{ matrix.variant == 'Bypass' }}
       working-directory: ${{ github.workspace }}/kernel
