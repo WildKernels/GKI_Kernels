@@ -12,56 +12,48 @@ on:
 
 jobs:
   build-a12-5-10:
-    needs: fetch-commits
     uses: ./.github/workflows/prepare.yml
     with:
       config_file: .github/kernel-config/a12-5.10.json
     secrets: inherit
 
   build-a13-5-10:
-    needs: fetch-commits
     uses: ./.github/workflows/prepare.yml
     with:
       config_file: .github/kernel-config/a13-5.10.json
     secrets: inherit
 
   build-a13-5-15:
-    needs: fetch-commits
     uses: ./.github/workflows/prepare.yml
     with:
       config_file: .github/kernel-config/a13-5.15.json
     secrets: inherit
 
   build-a14-5-15:
-    needs: fetch-commits
     uses: ./.github/workflows/prepare.yml
     with:
       config_file: .github/kernel-config/a14-5.15.json
     secrets: inherit
 
   build-a14-6-1:
-    needs: fetch-commits
     uses: ./.github/workflows/prepare.yml
     with:
       config_file: .github/kernel-config/a14-6.1.json
     secrets: inherit
 
   build-a15-6-6:
-    needs: fetch-commits
     uses: ./.github/workflows/prepare.yml
     with:
       config_file: .github/kernel-config/a15-6.6.json
     secrets: inherit
 
   build-a16-6-12:
-    needs: fetch-commits
     uses: ./.github/workflows/prepare.yml
     with:
       config_file: .github/kernel-config/a16-6.12.json
     secrets: inherit
 
   build-lts:
-    needs: fetch-commits
     uses: ./.github/workflows/prepare.yml
     with:
       config_file: .github/kernel-config/lts.json
