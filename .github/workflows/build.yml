@@ -69,13 +69,18 @@ jobs:
         remove_dotnet: true
         remove_haskell: true
         remove_tool_cache: true
-        remove_swap: true
         remove_packages: "azure-cli google-cloud-cli microsoft-edge-stable google-chrome-stable firefox postgresql* temurin-* *llvm* mysql* dotnet-sdk-*"
         remove_packages_one_command: true
         remove_folders: "/usr/share/swift /usr/share/miniconda /usr/share/az* /usr/local/lib/node_modules /usr/local/share/chromium /usr/local/share/powershell /usr/local/julia /usr/local/aws-cli /usr/local/aws-sam-cli /usr/share/gradle"
         rm_cmd: "rmz"  # Use 'rmz' for faster deletion (default: 'rm')
         rmz_version: "3.1.1"  # Required when rm_cmd is 'rmz'
         testing: false
+
+    - name: Setup more Swap (for LTO)
+      uses: thejerrybao/setup-swap-space@v1   # or pierotofy/set-swap-space
+      with:
+        swap-size-gb: 16          # 10-24 GB is common for heavy LTO
+        # swap-space-path: /mnt/swapfile   # optional
 
     - name: Setup Build Environment
       run: |
@@ -198,6 +203,7 @@ jobs:
         fi
 
     - name: Apply Kernel Branding
+      if: false
       uses: ./.github/actions/apply-kernel-branding
       with:
         build_type: ${{ matrix.variant }}
@@ -210,17 +216,10 @@ jobs:
       working-directory: ${{ github.workspace }}/kernel
       run: |
         set -ex
-        #make -C common mrproper
         if [ -f "build/build.sh" ]; then
-          SKIP_MRPROPER=1 GKI_DEFCONFIG_FRAGMENT="$GITHUB_WORKSPACE/wild_gki.fragment" LTO=thin BUILD_CONFIG=common/build.config.gki.aarch64 build/build.sh || exit 1
+          BUILD_CONFIG=common/build.config.gki.aarch64 build/build.sh || exit 1
         else
-          # Copy fragment to kernel tree for bazel
-          cp "$GITHUB_WORKSPACE/wild_gki.fragment" common/arch/arm64/configs/wild_gki.fragment
-          if [[ "$ANDROID_VERSION" == "android14" ]]; then
-            tools/bazel build --config=fast --lto=thin --defconfig_fragment=//common:arch/arm64/configs/wild_gki.fragment //common:kernel_aarch64_dist || exit 1
-          else
-            tools/bazel build --config=fast --lto=none --defconfig_fragment=//common:arch/arm64/configs/wild_gki.fragment //common:kernel_aarch64_dist || exit 1
-          fi
+          tools/bazel run --config=release //common:kernel_aarch64_dist || exit 1
         fi
 
     - name: Prepare AnyKernel3 Zip
